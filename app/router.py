@@ -5,6 +5,7 @@ import ast
 import operator
 import json
 import re
+import time
 import uuid
 from decimal import Decimal
 from datetime import datetime
@@ -724,6 +725,12 @@ def ui_status(authorization: str | None = Header(default=None)) -> dict[str, obj
                 "updated_at": int(item.get("updated_at") or 0),
             })
     session_items.sort(key=lambda item: int(item["updated_at"]), reverse=True)
+    valid_images = 0
+    if isinstance(images, dict):
+        now = int(time.time())
+        for item in images.values():
+            if isinstance(item, dict) and now - int(item.get("updated_at") or 0) <= settings.image_ttl_seconds:
+                valid_images += 1
     return {
         "ok": True,
         "service": "WxLinkAI",
@@ -732,7 +739,7 @@ def ui_status(authorization: str | None = Header(default=None)) -> dict[str, obj
         "history_limit": int(config_data.get("history_limit") or settings.history_limit),
         "image_ttl_seconds": int(config_data.get("image_ttl_seconds") or settings.image_ttl_seconds),
         "sessions": len(sessions) if isinstance(sessions, dict) else 0,
-        "images": len(images) if isinstance(images, dict) else 0,
+        "images": valid_images,
         "recent_sessions": session_items[:8],
         "providers": {
             "chat": _provider_summary(config_data.get("chat")),
