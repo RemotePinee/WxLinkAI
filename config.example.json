@@ -1,0 +1,43 @@
+{
+  "auth_key": "change-me",
+  "host": "0.0.0.0",
+  "port": 8090,
+  "routing_mode": "hybrid",
+  "history_limit": 8,
+  "history_user_max_chars": 300,
+  "history_assistant_max_chars": 600,
+  "image_ttl_seconds": 600,
+  "image_generation_timeout_seconds": 360,
+  "search": {
+    "enabled": true,
+    "base_url": "http://你的-searxng-地址:8080",
+    "timeout_seconds": 12,
+    "max_results": 5
+  },
+  "visual_chat_provider": "intent",
+  "persona": "你的机器人回复风格提示词",
+  "chat": {
+    "base_url": "https://你的聊天模型接口地址",
+    "protocol": "chat_completions",
+    "model": "你的聊天模型名称",
+    "account_type": "",
+    "api_key": "你的聊天模型密钥"
+  },
+  "intent": {
+    "base_url": "http://你的-chatgpt2api-地址:3030",
+    "protocol": "responses",
+    "model": "auto",
+    "account_type": "plus",
+    "api_key": "你的意图模型密钥"
+  },
+  "image": {
+    "base_url": "http://你的图片接口地址:3030",
+    "model": "gpt-image-2",
+    "visual_model": "auto",
+    "account_type": "",
+    "api_key": "你的图片接口密钥",
+    "protocol": "",
+    "api": "",
+    "chat_api": ""
+  }
+}

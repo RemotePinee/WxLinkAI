@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WxLinkAI 控制台</title>
+  <link rel="preload" href="/assets/fonts/google-fonts.css" as="style">
+  <link rel="preload" href="/assets/fonts/fira-7.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/fira-14.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/fira-21.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/fira-28.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/fira-35.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/wechat.svg" as="image" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/fonts/google-fonts.css">
+  <script>
+    try {
+      const oldAuthKey = localStorage.getItem("wechat-bridge-auth-key");
+      if (oldAuthKey && !localStorage.getItem("wxlinkai-auth-key")) {
+        localStorage.setItem("wxlinkai-auth-key", oldAuthKey);
+      }
+      if (localStorage.getItem("wxlinkai-auth-key")) {
+        document.documentElement.classList.add("has-auth-cache");
+      }
+    } catch {}
+  </script>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body>
+  <main class="shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <img src="/assets/wechat.svg" alt="">
+        </div>
+        <div>
+          <strong>WxLinkAI 控制台</strong>
+          <span>WAuxiliary 智能桥接</span>
+        </div>
+        <button class="icon-button logout-icon" id="logoutBtn" type="button" aria-label="退出登录" title="退出登录">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 4.75H8.75A2.75 2.75 0 0 0 6 7.5v9A2.75 2.75 0 0 0 8.75 19.25H15" />
+            <path d="M11.75 12h7.5" />
+            <path d="m16.75 8.75 3.25 3.25-3.25 3.25" />
+          </svg>
+        </button>
+      </div>
+
+      <section class="auth-card">
+        <div class="section-label">接入凭据</div>
+        <label>
+          <span>Auth Key</span>
+          <input id="authKey" type="password" autocomplete="off" placeholder="输入 bridge auth_key">
+        </label>
+        <button id="loadBtn">连接后台</button>
+        <div class="connection pending" id="statusPill"><span class="when-no-cache">同步状态</span><span class="when-auth-cache">已连接</span></div>
+      </section>
+
+      <section class="config-card" id="channels">
+        <div class="inspector-head">
+          <div class="config-headline">
+            <span class="eyebrow">Provider Config</span>
+            <h2>通道配置</h2>
+          </div>
+          <div class="save-actions">
+            <button class="secondary" id="formatBtn">整理</button>
+            <button id="saveBtn">保存配置</button>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist" aria-label="通道配置">
+          <button class="tab active" data-tab="chat" type="button">聊天</button>
+          <button class="tab" data-tab="intent" type="button">工具规划</button>
+          <button class="tab" data-tab="image" type="button">图片</button>
+          <button class="tab" data-tab="raw" type="button">JSON</button>
+        </div>
+
+        <div class="provider-stack">
+          <form class="provider-panel active" data-provider="chat">
+            <label><span>Base URL</span><input name="base_url" autocomplete="off"></label>
+            <label><span>Protocol</span><input name="protocol" autocomplete="off"></label>
+            <label><span>Model</span><input name="model" autocomplete="off"></label>
+            <label><span>Account Type</span><input name="account_type" autocomplete="off"></label>
+            <label><span>API Key</span><input name="api_key" type="password" autocomplete="off"></label>
+          </form>
+
+          <form class="provider-panel" data-provider="intent">
+            <label><span>Base URL</span><input name="base_url" autocomplete="off"></label>
+            <label><span>Protocol</span><input name="protocol" autocomplete="off"></label>
+            <label><span>Model</span><input name="model" autocomplete="off"></label>
+            <label><span>Account Type</span><input name="account_type" autocomplete="off"></label>
+            <label><span>API Key</span><input name="api_key" type="password" autocomplete="off"></label>
+          </form>
+
+          <form class="provider-panel" data-provider="image">
+            <label><span>Base URL</span><input name="base_url" autocomplete="off"></label>
+            <label><span>Protocol</span><input name="protocol" autocomplete="off"></label>
+            <label><span>Model</span><input name="model" autocomplete="off"></label>
+            <label><span>Visual Model</span><input name="visual_model" autocomplete="off"></label>
+            <label><span>Account Type</span><input name="account_type" autocomplete="off"></label>
+            <label><span>API Key</span><input name="api_key" type="password" autocomplete="off"></label>
+            <label><span>Images API</span><input name="api" autocomplete="off"></label>
+            <label><span>Chat API</span><input name="chat_api" autocomplete="off"></label>
+          </form>
+
+          <section class="provider-panel raw-panel" data-provider="raw" id="json">
+            <textarea id="configEditor" spellcheck="false" placeholder="连接后加载 config.json"></textarea>
+          </section>
+        </div>
+      </section>
+
+      <section class="side-note">
+        <span>运行口径</span>
+        <p>只接后端现有配置和状态接口，不改插件协议。</p>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <div>
+          <span class="eyebrow">Bridge Runtime</span>
+          <h1>机器人调度</h1>
+        </div>
+        <div class="top-actions">
+          <p id="messageLine" class="message" role="status" aria-live="polite"><span class="when-no-cache">正在初始化控制台。</span><span class="when-auth-cache">控制台已连接。</span></p>
+          <button class="secondary" id="refreshBtn">刷新状态</button>
+        </div>
+      </header>
+
+      <section class="metric-grid" id="overview">
+        <article>
+          <span>会话数</span>
+          <strong id="sessionsCount">-</strong>
+          <small>独立 talker/sender 上下文</small>
+        </article>
+        <article>
+          <span>图片缓存</span>
+          <strong id="imagesCount">-</strong>
+          <small>最近可用图片</small>
+        </article>
+        <article>
+          <span>路由模式</span>
+          <strong id="routingMode">-</strong>
+          <small>rules / hybrid / intent</small>
+        </article>
+        <article>
+          <span>图片 TTL</span>
+          <strong id="imageTtl">-</strong>
+          <small>缓存有效期</small>
+        </article>
+      </section>
+
+      <section class="panel routing-panel" id="routing">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Tool Routing</span>
+            <h2>工具路由链路</h2>
+          </div>
+          <span class="badge">Message -> Intent -> Tool -> Reply</span>
+        </div>
+
+        <div class="route-flow" aria-label="工具路由">
+          <div class="route-step strong">
+            <b>消息入口</b>
+            <span>私聊 / 群 @ / 最近文本</span>
+          </div>
+          <div class="route-step">
+            <b>工具规划</b>
+            <span>聊天、搜索、天气、视觉、生图</span>
+          </div>
+          <div class="route-step">
+            <b>上下文</b>
+            <span>按 talker + sender 隔离</span>
+          </div>
+          <div class="route-step">
+            <b>结果回传</b>
+            <span>纯文本 / 图片 / 任务状态</span>
+          </div>
+        </div>
+
+        <div class="search-config">
+          <label class="switch-line">
+            <input type="checkbox" id="searchEnabled">
+            <span>SearXNG 搜索</span>
+          </label>
+          <label>
+            <span>搜索地址</span>
+            <input id="searchBaseUrl" placeholder="http://host:8089">
+          </label>
+          <label>
+            <span>超时</span>
+            <input id="searchTimeout" type="number" min="3">
+          </label>
+          <label>
+            <span>结果数</span>
+            <input id="searchMax" type="number" min="1" max="8">
+          </label>
+        </div>
+      </section>
+
+      <section class="panel" id="sessions">
+        <div class="panel-head">
+          <div>
+            <span class="eyebrow">Conversation Memory</span>
+            <h2>最近会话</h2>
+          </div>
+          <span class="badge muted">最多显示 8 条</span>
+        </div>
+        <div class="session-list" id="recentSessions">
+          <div class="empty">连接后显示最近会话。</div>
+        </div>
+      </section>
+    </section>
+
+    <aside class="terminal" id="terminal">
+      <div class="terminal-head">
+        <div>
+          <span class="eyebrow">Live Terminal</span>
+          <h2>实时终端</h2>
+        </div>
+        <div class="terminal-actions">
+          <span class="badge pending" id="terminalState"><span class="when-no-cache">同步中</span><span class="when-auth-cache">在线</span></span>
+          <button class="secondary" id="terminalClearBtn" type="button">清空</button>
+        </div>
+      </div>
+      <div class="terminal-body" id="terminalStream">
+        <div class="terminal-line dim">正在同步终端事件。</div>
+      </div>
+    </aside>
+  </main>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

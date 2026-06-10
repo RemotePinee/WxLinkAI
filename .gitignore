@@ -1,0 +1,39 @@
+# Local secrets / runtime config
+/config.json
+/.env
+/.env.*
+
+# Runtime data
+/data/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Logs
+*.log
+!/plugins/WxLinkAI_1.0.0/plugin.log
+
+# Local archives / exports
+/wechat-bridge.zip
+/wxlinkai.zip
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Claude Code
+CLAUDE.md
